@@ -8,7 +8,7 @@ var lastEtherPrice = 0;
 var lastEtherBuy = 0;
 
 async function getAccounts(currency) {
-
+    //timestamp has to be generated now so it matches across our gmac and headers.
     var timestamp = Date.now() / 1000;
     var method = 'GET';
     var path = '/accounts';
