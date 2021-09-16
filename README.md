@@ -1,5 +1,8 @@
 # tradeobot
 
+#WARNING -
+This will now actively make trades unless you comment out calls to placeLimitOrder
+
 # SETUP
 Make sure nodejs is installed.
 
