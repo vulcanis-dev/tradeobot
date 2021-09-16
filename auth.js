@@ -7,9 +7,18 @@ var config = require('./config');
 //The hmac is created using this key and the sha256 algorithm
 //Finally is updated using the 'what' and then encrypted again ready to pass in your API request.
 //The request is verified by coinbase using the same information which you also pass in the request header.
-function getAuth(timestamp, method, requestPath) {
+function getAuth(timestamp, method, requestPath, body) {
     var secret = config.apiSecret;
-    var what = timestamp + method + requestPath + '';
+
+    //if your request will have a body i.e will be a post request then this must also be used to encrpt the key
+    var what = '';
+
+    if(body != null) {
+        what = timestamp + method + requestPath + JSON.stringify(body);
+    } else {
+        what = timestamp + method + requestPath + '';
+    }
+    
     
     var key = Buffer.from(secret, 'base64');
     
