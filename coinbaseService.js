@@ -38,6 +38,18 @@ async function getProducts() {
     return products;
 }
 
+
+//if no end is provided, it is set as now.
+async function getHistoricByProductId(productId, start, end, granularity) {
+    var timestamp = Date.now() / 1000;
+    var method = 'GET';
+    var path = '/products/' + productId + '/candles?start=' + start + '&end=' + end + '&granularity=' + granularity;
+    var hmac = auth.getAuth(timestamp, method, path);
+    var headers = getRequestHeaders(timestamp, hmac);
+    var products = await makeRequest(method, path, headers);    
+    return products;
+}
+
 async function getFillsByProductId(productId) {
     var timestamp = Date.now() / 1000;
     var method = 'GET';
@@ -56,6 +68,16 @@ async function getOrderById(orderId) {
     var headers = getRequestHeaders(timestamp, hmac);
     var order = await makeRequest(method, path, headers);
     return order;
+}
+
+async function getOrders() {
+    var timestamp = Date.now() / 1000;
+    var method = 'GET';
+    var path = '/orders'
+    var hmac = auth.getAuth(timestamp, method, path);
+    var headers = getRequestHeaders(timestamp, hmac);
+    var orders = await makeRequest(method, path, headers);
+    return orders;
 }
 
 async function placeLimitOrder(productId, price, size, side) {
@@ -83,15 +105,20 @@ function getRequestHeaders(timestamp, hmac) {
 async function makeRequest(method, path, headers, body) {
     const instance = getClient(headers);
 
-    if (method == 'GET') {
+    var response;
+
+    while(response === undefined){
+        if (method == 'GET') {
         var response = await instance.get(path).catch(error => {
             console.error('There was an error!', error);
-        });;
-    } else if (method == 'POST') {
-        var response = await instance.post(path, body).catch(error => {
-            console.error('There was an error!', error);
-        });;
+            });
+        } else if (method == 'POST') {
+            var response = await instance.post(path, body).catch(error => {
+                console.error('There was an error!', error);
+                });
+        }
     }
+    
 
     return response.data;
 }
@@ -104,5 +131,5 @@ function getClient(headers) {
     });
 }
 
-module.exports = { getAccounts, getProducts, getProductsByBaseCurrency, getProductsByCurrencyPair, placeLimitOrder, getFillsByProductId, getOrderById }
+module.exports = { getAccounts, getProducts, getOrders, getProductsByBaseCurrency, getProductsByCurrencyPair, placeLimitOrder, getFillsByProductId, getOrderById, getHistoricByProductId }
 
